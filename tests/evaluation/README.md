@@ -33,4 +33,4 @@ uv run --locked -m tests.evaluation.requirement_collection.requirement_eval_agen
 ## 说明
 
 - 指标为单次运行结果，受模型采样随机性影响，存在约 ±3 个百分点的波动；比较不同提示词版本时应在同一批次内重跑。
-- 样本与报告来自上游项目 [jiage-agent/TravelPlannerAgent](https://github.com/jiage-agent/TravelPlannerAgent) 的历史评测基线，保留在仓库中用于对照，不代表本项目当前的自动化测试覆盖率。
+- 本目录资料为历史对照基线，不属于默认自动化测试范围。
