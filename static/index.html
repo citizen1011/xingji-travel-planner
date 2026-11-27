@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f3">
+  <meta name="description" content="用目的地、天数和预算规划每日行程，并在出发前确认或调整。">
+  <title>行迹 · 智能旅行规划助手</title>
+  <link rel="stylesheet" href="/ui/planner.css">
+  <script src="/ui/planner.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="行迹首页"><span class="brand-mark" aria-hidden="true">行</span><span>行迹<span class="brand-caption">智能旅行规划助手</span></span></a>
+      <nav aria-label="主导航">
+        <a class="nav-active" href="#planner" aria-current="page">规划行程</a>
+        <button id="open-history" type="button">我的行程</button>
+      </nav>
+      <div id="service" class="service"><span aria-hidden="true"></span><span id="service-label">连接中</span></div>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">下一站，去哪儿？</h1>
+        <p>选个目的地，定下预算。把想去的地方排进每一天。</p>
+        <a class="hero-link" href="#planner">开始规划 <span aria-hidden="true">↓</span></a>
+      </div>
+    </section>
+
+    <div class="workspace" id="planner">
+      <section class="panel form-panel" aria-labelledby="form-title">
+        <h2 id="form-title">旅程信息</h2>
+        <form id="trip-form">
+          <div class="field">
+            <label for="destination">目的地</label>
+            <input id="destination" type="text" name="destination" placeholder="例如：杭州" maxlength="50" required>
+            <div class="chips city-chips" aria-label="试试这些目的地">
+              <button type="button" data-city="杭州" data-days="1" data-budget="1500">杭州</button>
+              <button type="button" data-city="成都" data-days="2" data-budget="2200">成都</button>
+              <button type="button" data-city="厦门" data-days="2" data-budget="2000">厦门</button>
+              <button type="button" data-city="丽江" data-days="3" data-budget="3000">丽江</button>
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="days">旅行天数</label>
+              <div class="unit-field"><input id="days" type="number" name="days" min="1" max="7" step="1" value="1" required><span>天</span></div>
+            </div>
+            <div class="field">
+              <label for="budget">总预算</label>
+              <div class="unit-field"><input id="budget" type="number" name="budget" min="1" max="1000000" step="1" placeholder="1500" required><span>元</span></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="start-date">出发日期 <span class="optional">选填</span></label>
+            <input id="start-date" type="date" name="startDate">
+          </div>
+          <fieldset class="field">
+            <legend>旅行偏好 <span class="optional">可多选</span></legend>
+            <div class="chips preferences">
+              <button type="button" aria-pressed="false">自然风光</button>
+              <button type="button" aria-pressed="false">当地美食</button>
+              <button type="button" aria-pressed="false">人文古迹</button>
+              <button type="button" aria-pressed="false">城市漫步</button>
+              <button type="button" aria-pressed="false">亲子友好</button>
+              <button type="button" aria-pressed="false">节奏放松</button>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="details">补充需求 <span class="optional">选填</span></label>
+            <textarea id="details" name="details" rows="2" maxlength="500" placeholder="例如：周六中午到，不安排徒步"></textarea>
+          </div>
+          <button id="generate" class="button primary generate" type="submit"><span>生成行程</span><span aria-hidden="true">→</span></button>
+        </form>
+      </section>
+
+      <section id="preview" class="panel preview-panel" aria-labelledby="preview-title">
+        <div class="preview-head">
+          <h2 id="preview-title" tabindex="-1">行程预览</h2>
+          <span id="plan-state" class="status-pill" hidden></span>
+        </div>
+        <p id="notice" class="notice" role="status" hidden></p>
+        <div id="empty" class="empty">
+          <div class="empty-symbol" aria-hidden="true"><span class="compass"></span></div>
+          <h3>还没有行程</h3>
+          <p>生成后，可以在这里查看每日活动和预估花费，并确认或调整你的方案。</p>
+        </div>
+        <div id="loading" class="loading" hidden>
+          <div class="loading-title"><span class="spinner" aria-hidden="true"></span><span id="loading-label">正在生成行程</span></div>
+          <p>本地模型正在编排和审核行程，可能需要一分钟左右。</p>
+          <div class="skeleton" aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+        <div id="itinerary" hidden>
+          <div class="trip-overview">
+            <div><h3 id="trip-title"></h3><p id="trip-details"></p></div>
+            <div class="trip-cost"><span>预估总花费</span><strong id="trip-cost"></strong><small id="trip-budget"></small></div>
+          </div>
+          <div id="budget-meter" class="budget-meter" hidden><span></span></div>
+          <ol id="day-list" class="day-list"></ol>
+          <div class="plan-controls" id="plan-controls">
+            <button id="approve" class="button primary" type="button">确认行程</button>
+            <button id="edit-plan" class="button secondary" type="button" aria-expanded="false" aria-controls="feedback-form">要求修改</button>
+            <button id="export-plan" class="button secondary" type="button">下载行程 <span aria-hidden="true">↓</span></button>
+          </div>
+          <form id="feedback-form" class="feedback-form" hidden>
+            <label for="feedback">希望调整哪里？</label>
+            <textarea id="feedback" name="feedback" rows="3" maxlength="500" placeholder="例如：下午安排轻松一些，减少打车" required></textarea>
+            <button class="button primary" type="submit">重新规划</button>
+          </form>
+        </div>
+        <p id="data-source" class="data-source" hidden></p>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="history" aria-labelledby="history-title">
+    <div class="dialog-head"><h2 id="history-title">我的行程</h2><button id="close-history" class="icon-button" type="button" aria-label="关闭">×</button></div>
+    <ul id="history-list" class="history-list"></ul>
+    <form id="restore-form" class="restore-form">
+      <label for="session-id">按会话编号打开</label>
+      <div><input id="session-id" name="sessionId" placeholder="输入会话编号" maxlength="100" required><button class="button secondary" type="submit">打开</button></div>
+      <p id="history-message" class="history-message" role="status" hidden></p>
+    </form>
+  </dialog>
+</body>
+</html>
